@@ -1,8 +1,8 @@
 {
-  "name": "packageDetect",
-  "description": "A demonstration of combining AI with human intelligence to detect packages at your doorstep.",
-  "version": "0.0.0",
-  "homepage": "",
+  "name": "demos",
+  "description": "Demonstrations of combining AI with human intelligence.",
+  "version": "0.0.1",
+  "homepage": "http://crowdflower.github.io/demos",
   "main": "src/",
   "keywords": [
     "feathers"
