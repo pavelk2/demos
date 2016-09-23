@@ -5,7 +5,7 @@ const request = require('request');
 
 class Service {
   constructor(options) {
-    this.predictions = [];
+    this.results = {};
     this.options = options || {};
   }
 
@@ -28,21 +28,23 @@ class Service {
   }
 
   get(id, params) {
-    return Promise.resolve({
-      id, text: `A new message with ID: ${id}!`
-    });
+    return Promise.resolve(this.results[id]);
   }
 
   create(data, params) {
-    return Promise.resolve([])
+    var result = request.post(`https://api.crowdflower.com/v1/jobs/${process.env.CF_JOB_ID}/units.json?key=${process.env.CF_API_KEY}`).form({
+      unit: {
+        data: { url: data.url || params.url }
+      }
+    });
+    this.results[result.unit.id] = {state: "pending"};
+    return Promise.resolve(result)
   }
 
   update(id, data, params) {
-    return Promise.resolve(data);
-  }
-
-  patch(id, data, params) {
-    return Promise.resolve(data);
+    var payload = JSON.parse(data.payload)
+    this.results[payload.id] = payload;
+    return Promise.resolve(payload);
   }
 
   remove(id, params) {

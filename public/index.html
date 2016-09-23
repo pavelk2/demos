@@ -93,6 +93,9 @@
         margin:15px;
         max-height: 300px;
       }
+      .banner h3 {
+        color:#FFF
+      }
     </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -105,15 +108,11 @@
     <div class="row">
       <a href="http://ai.crowdflower.com" class="logo">CrowdFlower</a>
       <h2>Is there a package at my door?</h2>
-      <div class="input-group input-group-lg">
-        <input id="searchterm" value="http://sonderbooks.com/blog/wp-content/uploads/2011/07/boxes.jpg" type="text" name="input" class="form-control" />
-        <div class="input-group-btn"><button id="start" class="btn brn-success">Go!</button></div>
-      </div>
       <div class="results">
       </div>
       <div id="chosen" style="display:none">
         <img src="" /><br><br>
-        <h4 id="result"><i class="fa fa-spinner fa-pulse fa-fw"></i></h4>
+        <h3 id="result"><i class="fa fa-spinner fa-pulse fa-fw"></i></h3>
       </div>
     </p>
     </div>
@@ -134,12 +133,6 @@
   <div class="col-md-2">
   </div>
   <div class="col-md-8">
-    <ul class="list-inline" style="text-align:center">
-      <li><a href="#sample1">Sample 1</a></li>
-      <li><a href="#sample2">Sample 2</a></li>
-      <li><a href="#sample3">Sample 3</a></li>
-      <li><a href="#sample4">Sample 4</a></li>
-    </ul>
     <h3>About</h3>
     <p style="font-size:1.5em">
       Built with Cortana Image Classifier
@@ -149,33 +142,32 @@
   </div>
 </div>
 <script type="text/javascript">
-//Custom JS can go here:
-$('#start').on('click', function() {
-  $('#chosen').css('display', 'block').find("img").attr("src", $("#searchterm").val())
-  $.ajax({
-    url: "/predictions",
-    data: {url: $("#searchterm").val()}
-  }).done(function(data){
-    console.log(data)
-    $('#result').text(data.result)
+  //Custom JS can go here:
+  function getQueryParams(queryString) {
+    var tokens,
+        params = {},
+        re = /[?&]?([^=]+)=([^&]*)/g;
+    queryString = queryString || document.location.search;
+    while (tokens = re.exec(queryString.split("+").join(" ")))
+        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+    return params;
+  }
+  $(document).on('keydown', function(e){
+    var url = getQueryParams().url || "http://sonderbooks.com/blog/wp-content/uploads/2011/07/boxes.jpg"
+    if(e.keyCode == 32 || e.keyCode == 13) { //space or enter
+      $('#chosen').css('display', 'block').find("img").attr("src", url)
+      $.ajax({
+        url: "/predictions",
+        data: {url: url}
+      }).done(function(data){
+        console.log(data)
+        if(data.result.toString().match(/confidence/))
+          $('#result').text("Package detected!")
+        else
+          $('#result').text("Sending to human for verification.")
+      })
+    }
   })
-})
-
-$("#search").click(function(){
-  $(".results").empty()
-  $.getJSON("http://api.flickr.com/services/feeds/photos_public.gne?jsoncallback=?",
-  {
-   tags: $("#searchterm").val(),
-   tagmode: "any",
-   format: "json"
-  },
-  function(data) {
-   $.each(data.items, function(i,item){
-     $("<img/>").attr("src", item.media.m).prependTo(".results");
-     if ( i == 10 ) return false;
-   });
-  });
-});
 </script>
 
         </div>

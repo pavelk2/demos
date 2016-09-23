@@ -12,6 +12,7 @@ const rest = require('feathers-rest');
 const bodyParser = require('body-parser');
 const middleware = require('./middleware');
 const services = require('./services');
+const methodOverride = require('method-override')
 
 const app = feathers();
 
@@ -20,6 +21,7 @@ app.configure(configuration(path.join(__dirname, '..')));
 app.use(compress())
   .options('*', cors())
   .use(cors())
+  .use(methodOverride('_method'))
   .use(favicon( path.join(app.get('public'), 'favicon.ico') ))
   .use('/', serveStatic( app.get('public') ))
   .use(bodyParser.json())
